@@ -305,10 +305,6 @@ export default class ReactGridLayout extends React.Component {
     var l = getLayoutItem(layout, i);
     if (!l) return;
 
-    // Set new width and height.
-    l.w = w;
-    l.h = h;
-
     // Create placeholder element (display only)
     var placeholder = {
       w: w, h: h, x: l.x, y: l.y, static: true, i: i
@@ -317,15 +313,18 @@ export default class ReactGridLayout extends React.Component {
     this.props.onResize(layout, oldResizeItem, l, placeholder, e, node);
 
     // Re-compact the layout and set the drag placeholder.
-    this.setState({
-      layout: compact(layout, this.props.verticalCompact),
-      activeDrag: placeholder
-    });
+    this.setState({ activeDrag: placeholder });
   }
 
   onResizeStop(i:string, w:number, h:number, {e, node}: ResizeEvent) {
     const {layout, oldResizeItem} = this.state;
     var l = getLayoutItem(layout, i);
+    var oldW = l.w;
+
+    l.w = w;
+    if (getFirstCollision(layout, l)) {
+      l.w = oldW;
+    }
 
     this.props.onResizeStop(layout, oldResizeItem, l, null, e, node);
 

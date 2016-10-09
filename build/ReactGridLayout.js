@@ -221,10 +221,6 @@ var ReactGridLayout = function (_React$Component) {
     var l = (0, _utils.getLayoutItem)(layout, i);
     if (!l) return;
 
-    // Set new width and height.
-    l.w = w;
-    l.h = h;
-
     // Create placeholder element (display only)
     var placeholder = {
       w: w, h: h, x: l.x, y: l.y, static: true, i: i
@@ -233,10 +229,7 @@ var ReactGridLayout = function (_React$Component) {
     this.props.onResize(layout, oldResizeItem, l, placeholder, e, node);
 
     // Re-compact the layout and set the drag placeholder.
-    this.setState({
-      layout: (0, _utils.compact)(layout, this.props.verticalCompact),
-      activeDrag: placeholder
-    });
+    this.setState({ activeDrag: placeholder });
   };
 
   ReactGridLayout.prototype.onResizeStop = function onResizeStop(i, w, h, _ref6) {
@@ -247,6 +240,12 @@ var ReactGridLayout = function (_React$Component) {
     var oldResizeItem = _state2.oldResizeItem;
 
     var l = (0, _utils.getLayoutItem)(layout, i);
+    var oldW = l.w;
+
+    l.w = w;
+    if ((0, _utils.getFirstCollision)(layout, l)) {
+      l.w = oldW;
+    }
 
     this.props.onResizeStop(layout, oldResizeItem, l, null, e, node);
 
