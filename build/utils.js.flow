@@ -95,15 +95,6 @@ export function compact(layout: Layout, verticalCompact: boolean): Layout {
   for (let i = 0, len = sorted.length; i < len; i++) {
     let l = cloneLayoutItem(sorted[i]);
 
-    // Don't move static elements
-    if (!l.static) {
-      l = compactItem(compareWith, l, verticalCompact);
-
-      // Add to comparison array. We only collide with items before this one.
-      // Statics are already in this array.
-      compareWith.push(l);
-    }
-
     // Add to output array to make sure they still come out in the right order.
     out[layout.indexOf(sorted[i])] = l;
 

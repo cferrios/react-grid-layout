@@ -117,15 +117,6 @@ function compact(layout, verticalCompact) {
   for (var _i3 = 0, len = sorted.length; _i3 < len; _i3++) {
     var l = cloneLayoutItem(sorted[_i3]);
 
-    // Don't move static elements
-    if (!l.static) {
-      l = compactItem(compareWith, l, verticalCompact);
-
-      // Add to comparison array. We only collide with items before this one.
-      // Statics are already in this array.
-      compareWith.push(l);
-    }
-
     // Add to output array to make sure they still come out in the right order.
     out[layout.indexOf(sorted[_i3])] = l;
 

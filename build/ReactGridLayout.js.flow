@@ -2,7 +2,7 @@
 import React, {PropTypes} from 'react';
 import isEqual from 'lodash.isequal';
 import {autoBindHandlers, bottom, childrenEqual, cloneLayoutItem, compact, getLayoutItem, moveElement,
-  synchronizeLayoutWithChildren, validateLayout} from './utils';
+  getFirstCollision, synchronizeLayoutWithChildren, validateLayout} from './utils';
 import GridItem from './GridItem';
 const noop = function() {};
 
