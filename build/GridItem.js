@@ -115,6 +115,7 @@ var GridItem = function (_React$Component) {
     var w = _props3.w;
     var h = _props3.h;
     var maxRows = _props3.maxRows;
+    var bounce = _props3.bounce;
 
     var colWidth = this.calcColWidth();
 

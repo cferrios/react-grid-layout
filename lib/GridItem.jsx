@@ -156,7 +156,7 @@ export default class GridItem extends React.Component {
    * @return {Object} x and y in grid units.
    */
   calcXY(top: number, left: number): {x: number, y: number} {
-    const {margin, cols, rowHeight, w, h, maxRows} = this.props;
+    const {margin, cols, rowHeight, w, h, maxRows, bounce} = this.props;
     const colWidth = this.calcColWidth();
 
     // left = colWidth * x + margin * (x + 1)
