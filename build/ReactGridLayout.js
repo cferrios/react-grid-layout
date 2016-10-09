@@ -142,15 +142,8 @@ var ReactGridLayout = function (_React$Component) {
       w: l.w, h: l.h, x: l.x, y: l.y, placeholder: true, i: i
     };
 
-    // Move the element to the dragged location.
-    layout = (0, _utils.moveElement)(layout, l, x, y, true /* isUserAction */);
-
     this.props.onDrag(layout, oldDragItem, l, placeholder, e, node);
-
-    this.setState({
-      layout: (0, _utils.compact)(layout, this.props.verticalCompact),
-      activeDrag: placeholder
-    });
+    this.setState({ activeDrag: placeholder });
   };
 
   /**
@@ -173,7 +166,11 @@ var ReactGridLayout = function (_React$Component) {
     if (!l) return;
 
     // Move the element here
+    var oldX = l.x;
     layout = (0, _utils.moveElement)(layout, l, x, y, true /* isUserAction */);
+    if (getFirstCollision(layout, l)) {
+      l.x = oldX;
+    }
 
     this.props.onDragStop(layout, oldDragItem, l, null, e, node);
 

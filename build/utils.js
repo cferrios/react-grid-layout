@@ -254,6 +254,10 @@ function moveElement(layout, l, x, y, isUserAction) {
   if (typeof y === 'number') l.y = y;
   l.moved = true;
 
+  // Griffith: No need to move elements away.
+  // In case of collision we want to restore the item's original position.
+  return layout;
+
   // If this collides with anything, move it.
   // When doing this comparison, we have to sort the items we compare with
   // to ensure, in the case of multiple collisions, that we're getting the
