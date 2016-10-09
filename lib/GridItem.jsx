@@ -84,7 +84,11 @@ export default class GridItem extends React.Component {
     // Selector for draggable handle
     handle: PropTypes.string,
     // Selector for draggable cancel (see react-draggable)
-    cancel: PropTypes.string
+    cancel: PropTypes.string,
+
+    // Fork
+    axis: PropTypes.oneOf(['both', 'x', 'y', 'none']),
+    bounce: PropTypes.oneOf(['both', 'x', 'y', 'none'])
   };
 
   static defaultProps = {
@@ -93,7 +97,8 @@ export default class GridItem extends React.Component {
     minH: 1,
     minW: 1,
     maxH: Infinity,
-    maxW: Infinity
+    maxW: Infinity,
+    axis: 'both',
   };
 
   state: State = {
@@ -165,8 +170,12 @@ export default class GridItem extends React.Component {
     let y = Math.round((top - margin[1]) / (rowHeight + margin[1]));
 
     // Capping
-    x = Math.max(Math.min(x, cols - w), 0);
-    y = Math.max(Math.min(y, maxRows - h), 0);
+    if (bounce === 'both' || bounce === 'x') {
+      x = Math.max(Math.min(x, cols - w), 0);
+    }
+    if (bounce === 'both' || bounce === 'y') {
+      y = Math.max(Math.min(y, maxRows - h), 0);
+    }
 
     return {x, y};
   }
@@ -299,9 +308,11 @@ export default class GridItem extends React.Component {
           this.setState({dragging: newPosition});
           break;
         case 'onDrag':
+          const isDraggableX = this.props.axis === 'both' || this.props.axis === 'x';
+          const isDraggableY = this.props.axis === 'both' || this.props.axis === 'y';
           if (!this.state.dragging) throw new Error('onDrag called before onDragStart.');
-          newPosition.left = this.state.dragging.left + deltaX;
-          newPosition.top = this.state.dragging.top + deltaY;
+          newPosition.left = isDraggableX ? this.state.dragging.left + deltaX : this.state.dragging.left;
+          newPosition.top = isDraggableY ? this.state.dragging.top + deltaY : this.state.dragging.top;
           this.setState({dragging: newPosition});
           break;
         case 'onDragStop':

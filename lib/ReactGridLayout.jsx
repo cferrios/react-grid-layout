@@ -425,6 +425,7 @@ export default class ReactGridLayout extends React.Component {
         minW={l.minW}
         maxH={l.maxH}
         maxW={l.maxW}
+        axis={l.axis}
         static={l.static}
         >
         {child}
