@@ -172,8 +172,6 @@ var ReactGridLayout = function (_React$Component) {
       l.x = oldX;
     }
 
-    this.props.onDragStop(layout, oldDragItem, l, null, e, node);
-
     // Set state
     var newLayout = (0, _utils.compact)(layout, this.props.verticalCompact);
     var oldLayout = this.state.oldLayout;
@@ -185,6 +183,7 @@ var ReactGridLayout = function (_React$Component) {
       oldLayout: null
     });
 
+    this.props.onDragStop(layout, oldDragItem, l, null, e, node);
     this.onLayoutMaybeChanged(newLayout, oldLayout);
   };
 
@@ -247,8 +246,6 @@ var ReactGridLayout = function (_React$Component) {
       l.w = oldW;
     }
 
-    this.props.onResizeStop(layout, oldResizeItem, l, null, e, node);
-
     // Set state
     var newLayout = (0, _utils.compact)(layout, this.props.verticalCompact);
     var oldLayout = this.state.oldLayout;
@@ -260,6 +257,7 @@ var ReactGridLayout = function (_React$Component) {
       oldLayout: null
     });
 
+    this.props.onResizeStop(layout, oldResizeItem, l, null, e, node);
     this.onLayoutMaybeChanged(newLayout, oldLayout);
   };
 

@@ -265,8 +265,6 @@ export default class ReactGridLayout extends React.Component {
       l.x = oldX;
     }
 
-    this.props.onDragStop(layout, oldDragItem, l, null, e, node);
-
     // Set state
     const newLayout = compact(layout, this.props.verticalCompact);
     const {oldLayout} = this.state;
@@ -277,6 +275,7 @@ export default class ReactGridLayout extends React.Component {
       oldLayout: null,
     });
 
+    this.props.onDragStop(layout, oldDragItem, l, null, e, node);
     this.onLayoutMaybeChanged(newLayout, oldLayout);
   }
 
@@ -326,8 +325,6 @@ export default class ReactGridLayout extends React.Component {
       l.w = oldW;
     }
 
-    this.props.onResizeStop(layout, oldResizeItem, l, null, e, node);
-
     // Set state
     const newLayout = compact(layout, this.props.verticalCompact);
     const {oldLayout} = this.state;
@@ -338,6 +335,7 @@ export default class ReactGridLayout extends React.Component {
       oldLayout: null
     });
 
+    this.props.onResizeStop(layout, oldResizeItem, l, null, e, node);
     this.onLayoutMaybeChanged(newLayout, oldLayout);
   }
 
