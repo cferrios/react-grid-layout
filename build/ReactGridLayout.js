@@ -168,9 +168,7 @@ var ReactGridLayout = function (_React$Component) {
     // Move the element here
     var oldX = l.x;
     layout = (0, _utils.moveElement)(layout, l, x, y, true /* isUserAction */);
-
-    var collision = (0, _utils.getFirstCollision)(layout, l);
-    if (collision && collision.y === l.y) {
+    if (oldDragItem.y === y && (0, _utils.getFirstCollision)(layout, l)) {
       l.x = oldX;
     }
 

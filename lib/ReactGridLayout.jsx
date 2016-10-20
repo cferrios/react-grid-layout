@@ -261,9 +261,7 @@ export default class ReactGridLayout extends React.Component {
     // Move the element here
     const oldX = l.x;
     layout = moveElement(layout, l, x, y, true /* isUserAction */);
-
-    let collision = getFirstCollision(layout, l);
-    if (collision && collision.y === l.y) {
+    if (oldDragItem.y === y && getFirstCollision(layout, l)) {
       l.x = oldX;
     }
 
