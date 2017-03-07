@@ -474,6 +474,7 @@ GridItem.propTypes = {
   isDraggable: _react.PropTypes.bool.isRequired,
   isResizable: _react.PropTypes.bool.isRequired,
   static: _react.PropTypes.bool,
+  overlap: _react.PropTypes.bool,
 
   // Use CSS transforms instead of top/left
   useCSSTransforms: _react.PropTypes.bool.isRequired,

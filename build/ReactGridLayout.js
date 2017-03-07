@@ -366,7 +366,8 @@ var ReactGridLayout = function (_React$Component) {
         maxH: l.maxH,
         maxW: l.maxW,
         axis: l.axis,
-        'static': l.static
+        'static': l.static,
+        overlap: l.overlap
       },
       child
     );

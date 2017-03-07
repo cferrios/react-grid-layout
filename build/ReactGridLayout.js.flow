@@ -421,6 +421,7 @@ export default class ReactGridLayout extends React.Component {
         maxW={l.maxW}
         axis={l.axis}
         static={l.static}
+        overlap={l.overlap}
         >
         {child}
       </GridItem>

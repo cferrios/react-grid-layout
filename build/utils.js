@@ -67,7 +67,7 @@ function cloneLayoutItem(layoutItem) {
   return {
     w: layoutItem.w, h: layoutItem.h, x: layoutItem.x, y: layoutItem.y, i: layoutItem.i,
     minW: layoutItem.minW, maxW: layoutItem.maxW, minH: layoutItem.minH, maxH: layoutItem.maxH, axis: layoutItem.axis,
-    moved: Boolean(layoutItem.moved), static: Boolean(layoutItem.static),
+    moved: Boolean(layoutItem.moved), static: Boolean(layoutItem.static), overlap: Boolean(layoutItem.overlap),
     // These can be null
     isDraggable: layoutItem.isDraggable, isResizable: layoutItem.isResizable
   };
@@ -89,6 +89,7 @@ function childrenEqual(a, b) {
  * Given two layoutitems, check if they collide.
  */
 function collides(l1, l2) {
+  if (l2.overlap) return false;
   if (l1 === l2) return false; // same element
   if (l1.x + l1.w <= l2.x) return false; // l1 is left of l2
   if (l1.x >= l2.x + l2.w) return false; // l1 is right of l2
