@@ -89,7 +89,7 @@ function childrenEqual(a, b) {
  * Given two layoutitems, check if they collide.
  */
 function collides(l1, l2) {
-  if (l1.overlap) return false;
+  if (l1.overlap || l2.overlap) return false;
   if (l1 === l2) return false; // same element
   if (l1.x + l1.w <= l2.x) return false; // l1 is left of l2
   if (l1.x >= l2.x + l2.w) return false; // l1 is right of l2
