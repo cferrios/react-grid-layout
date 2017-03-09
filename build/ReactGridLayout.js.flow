@@ -240,6 +240,8 @@ export default class ReactGridLayout extends React.Component {
       w: l.w, h: l.h, x: l.x, y: l.y, placeholder: true, i: i
     };
 
+    layout = moveElement(layout, l, x, y, true /* isUserAction */);
+
     this.props.onDrag(layout, oldDragItem, l, placeholder, e, node);
     this.setState({ activeDrag: placeholder });
   }

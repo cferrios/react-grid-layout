@@ -142,6 +142,8 @@ var ReactGridLayout = function (_React$Component) {
       w: l.w, h: l.h, x: l.x, y: l.y, placeholder: true, i: i
     };
 
+    layout = (0, _utils.moveElement)(layout, l, x, y, true /* isUserAction */);
+
     this.props.onDrag(layout, oldDragItem, l, placeholder, e, node);
     this.setState({ activeDrag: placeholder });
   };
