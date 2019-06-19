@@ -31,6 +31,8 @@ function getBreakpointFromWidth(breakpoints, width) {
  * @param  {Object} cols       Map of breakpoints to cols.
  * @return {Number}            Number of cols.
  */
+
+
 function getColsFromBreakpoint(breakpoint, cols) {
   if (!cols[breakpoint]) {
     throw new Error("ResponsiveReactGridLayout: `cols` entry for breakpoint " + breakpoint + " is missing!");

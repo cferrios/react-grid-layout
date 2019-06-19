@@ -36,6 +36,7 @@ var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// All callbacks are of the signature (layout, oldItem, newItem, placeholder, e).
 var isProduction = process.env.NODE_ENV === 'production';
 
 /**
@@ -78,6 +79,7 @@ function cloneLayoutItem(layoutItem) {
  * This will catch differences in keys, order, and length.
  */
 function childrenEqual(a, b) {
+  // $FlowIgnore: Appears to think map calls back w/array
   return (0, _lodash2.default)(_react2.default.Children.map(a, function (c) {
     return c.key;
   }), _react2.default.Children.map(b, function (c) {
@@ -135,7 +137,7 @@ function compactItem(compareWith, l, verticalCompact) {
   if (verticalCompact) {
     // Bottom 'y' possible is the bottom of the layout.
     // This allows you to do nice stuff like specify {y: Infinity}
-    // This is is here because it the layout must be sorted in order to get the correct bottom `y`.
+    // This is here because the layout must be sorted in order to get the correct bottom `y`.
     l.y = Math.min(bottom(compareWith), l.y);
 
     // Move the element up as far as it can go without colliding.
@@ -232,7 +234,7 @@ function getStatics(layout) {
  * @param  {Number}     [x]    X position in grid units.
  * @param  {Number}     [y]    Y position in grid units.
  * @param  {Boolean}    [isUserAction] If true, designates that the item we're moving is
- *                                     being dragged/resized by th euser.
+ *                                     being dragged/resized by the user.
  */
 function moveElement(layout, l, x, y, isUserAction) {
   if (l.static) return layout;
@@ -311,7 +313,7 @@ function moveElementAwayFromCollision(layout, collidesWith, itemToMove, isUserAc
   }
 
   // Previously this was optimized to move below the collision directly, but this can cause problems
-  // with cascading moves, as an item may actually leapflog a collision and cause a reversal in order.
+  // with cascading moves, as an item may actually leapfrog a collision and cause a reversal in order.
   return moveElement(layout, itemToMove, undefined, itemToMove.y + 1);
 }
 
@@ -326,10 +328,10 @@ function perc(num) {
 }
 
 function setTransform(_ref) {
-  var top = _ref.top;
-  var left = _ref.left;
-  var width = _ref.width;
-  var height = _ref.height;
+  var top = _ref.top,
+      left = _ref.left,
+      width = _ref.width,
+      height = _ref.height;
 
   // Replace unitless items with px
   var translate = 'translate(' + left + 'px,' + top + 'px)';
@@ -346,10 +348,10 @@ function setTransform(_ref) {
 }
 
 function setTopLeft(_ref2) {
-  var top = _ref2.top;
-  var left = _ref2.left;
-  var width = _ref2.width;
-  var height = _ref2.height;
+  var top = _ref2.top,
+      left = _ref2.left,
+      width = _ref2.width,
+      height = _ref2.height;
 
   return {
     top: top + 'px',
@@ -370,6 +372,9 @@ function sortLayoutItemsByRowCol(layout) {
   return [].concat(layout).sort(function (a, b) {
     if (a.y > b.y || a.y === b.y && a.x > b.x) {
       return 1;
+    } else if (a.y === b.y && a.x === b.x) {
+      // Without this, we can get different sort results in IE vs. Chrome/FF
+      return 0;
     }
     return -1;
   });
@@ -388,13 +393,14 @@ function synchronizeLayoutWithChildren(initialLayout, children, cols, verticalCo
   initialLayout = initialLayout || [];
 
   // Generate one layout item per child.
-  var layout = _react2.default.Children.map(children, function (child) {
+  var layout = [];
+  _react2.default.Children.forEach(children, function (child, i) {
     // Don't overwrite if it already exists.
-    var exists = getLayoutItem(initialLayout, child.key || "1" /* FIXME satisfies Flow */);
+    var exists = getLayoutItem(initialLayout, String(child.key));
     if (exists) {
-      return cloneLayoutItem(exists);
+      layout[i] = cloneLayoutItem(exists);
     } else {
-      if (process.env.NODE_ENV !== 'production' && child.props._grid) {
+      if (!isProduction && child.props._grid) {
         console.warn('`_grid` properties on children have been deprecated as of React 15.2. ' + // eslint-disable-line
         'Please use `data-grid` or add your properties directly to the `layout`.');
       }
@@ -406,10 +412,11 @@ function synchronizeLayoutWithChildren(initialLayout, children, cols, verticalCo
           validateLayout([g], 'ReactGridLayout.children');
         }
 
-        return cloneLayoutItem(_extends({}, g, { i: child.key }));
+        layout[i] = cloneLayoutItem(_extends({}, g, { i: child.key }));
+      } else {
+        // Nothing provided: ensure this is added to the bottom
+        layout[i] = cloneLayoutItem({ w: 1, h: 1, x: 0, y: bottom(layout), i: String(child.key) });
       }
-      // Nothing provided: ensure this is added to the bottom
-      return cloneLayoutItem({ w: 1, h: 1, x: 0, y: bottom(layout), i: child.key || "1" });
     }
   });
 

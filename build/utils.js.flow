@@ -1,23 +1,33 @@
 // @flow
 import isEqual from 'lodash.isequal';
 import React from 'react';
-export type LayoutItemRequired = {w: number, h: number, x: number, y: number, i: string};
-export type LayoutItem = LayoutItemRequired &
-                         {minW?: number, minH?: number, maxW?: number, maxH?: number,
-                          moved?: boolean, static?: boolean, overlap?: boolean,
-                          isDraggable?: ?boolean, isResizable?: ?boolean};
+import type {ChildrenArray as ReactChildrenArray, Element as ReactElement} from 'react';
+export type LayoutItem = {
+  w: number, h: number, x: number, y: number, i: string,
+  minW?: number, minH?: number, maxW?: number, maxH?: number,
+  moved?: boolean, static?: boolean,
+  isDraggable?: ?boolean, isResizable?: ?boolean
+};
 export type Layout = Array<LayoutItem>;
 export type Position = {left: number, top: number, width: number, height: number};
-export type DragCallbackData = {
+export type ReactDraggableCallbackData = {
   node: HTMLElement,
   x: number, y: number,
   deltaX: number, deltaY: number,
   lastX: number, lastY: number
 };
-export type DragEvent = {e: Event} & DragCallbackData;
+
+export type PartialPosition = {left: number, top: number};
 export type Size = {width: number, height: number};
-export type ResizeEvent = {e: Event, node: HTMLElement, size: Size};
-export type ReactChildren = React.Element<any>[] | React.Element<any> | {[key: string] : React.Element<any>};
+export type GridDragEvent = {e: Event, node: HTMLElement, newPosition: PartialPosition};
+export type GridResizeEvent = {e: Event, node: HTMLElement, size: Size};
+
+type REl = ReactElement<any>;
+export type ReactChildren = ReactChildrenArray<REl>;
+
+// All callbacks are of the signature (layout, oldItem, newItem, placeholder, e).
+export type EventCallback =
+  (Layout, oldItem: ?LayoutItem, newItem: ?LayoutItem, placeholder: ?LayoutItem, Event, ?HTMLElement) => void;
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -60,7 +70,8 @@ export function cloneLayoutItem(layoutItem: LayoutItem): LayoutItem {
  * This will catch differences in keys, order, and length.
  */
 export function childrenEqual(a: ReactChildren, b: ReactChildren): boolean {
-  return isEqual(React.Children.map(a, c => c.key), React.Children.map(b, c => c.key));
+  // $FlowIgnore: Appears to think map calls back w/array
+  return isEqual(React.Children.map(a, (c) => c.key), React.Children.map(b, (c) => c.key));
 }
 
 /**
@@ -113,7 +124,7 @@ export function compactItem(compareWith: Layout, l: LayoutItem, verticalCompact:
   if (verticalCompact) {
     // Bottom 'y' possible is the bottom of the layout.
     // This allows you to do nice stuff like specify {y: Infinity}
-    // This is is here because it the layout must be sorted in order to get the correct bottom `y`.
+    // This is here because the layout must be sorted in order to get the correct bottom `y`.
     l.y = Math.min(bottom(compareWith), l.y);
 
     // Move the element up as far as it can go without colliding.
@@ -207,7 +218,7 @@ export function getStatics(layout: Layout): Array<LayoutItem> {
  * @param  {Number}     [x]    X position in grid units.
  * @param  {Number}     [y]    Y position in grid units.
  * @param  {Boolean}    [isUserAction] If true, designates that the item we're moving is
- *                                     being dragged/resized by th euser.
+ *                                     being dragged/resized by the user.
  */
 export function moveElement(layout: Layout, l: LayoutItem, x: ?number, y: ?number, isUserAction: ?boolean): Layout {
   if (l.static) return layout;
@@ -287,7 +298,7 @@ export function moveElementAwayFromCollision(layout: Layout, collidesWith: Layou
   }
 
   // Previously this was optimized to move below the collision directly, but this can cause problems
-  // with cascading moves, as an item may actually leapflog a collision and cause a reversal in order.
+  // with cascading moves, as an item may actually leapfrog a collision and cause a reversal in order.
   return moveElement(layout, itemToMove, undefined, itemToMove.y + 1);
 }
 
@@ -336,6 +347,9 @@ export function sortLayoutItemsByRowCol(layout: Layout): Layout {
   return [].concat(layout).sort(function(a, b) {
     if (a.y > b.y || (a.y === b.y && a.x > b.x)) {
       return 1;
+    } else if (a.y === b.y && a.x === b.x) {
+      // Without this, we can get different sort results in IE vs. Chrome/FF
+      return 0;
     }
     return -1;
   });
@@ -355,13 +369,14 @@ export function synchronizeLayoutWithChildren(initialLayout: Layout, children: R
   initialLayout = initialLayout || [];
 
   // Generate one layout item per child.
-  let layout: Layout = React.Children.map(children, (child: React.Element<any>) => {
+  let layout: Layout = [];
+  React.Children.forEach(children, (child: ReactElement<any>, i: number) => {
     // Don't overwrite if it already exists.
-    const exists = getLayoutItem(initialLayout, child.key || "1" /* FIXME satisfies Flow */);
+    const exists = getLayoutItem(initialLayout, String(child.key));
     if (exists) {
-      return cloneLayoutItem(exists);
+      layout[i] = cloneLayoutItem(exists);
     } else {
-      if (process.env.NODE_ENV !== 'production' && child.props._grid) {
+      if (!isProduction && child.props._grid) {
         console.warn('`_grid` properties on children have been deprecated as of React 15.2. ' + // eslint-disable-line
           'Please use `data-grid` or add your properties directly to the `layout`.');
       }
@@ -373,10 +388,11 @@ export function synchronizeLayoutWithChildren(initialLayout: Layout, children: R
           validateLayout([g], 'ReactGridLayout.children');
         }
 
-        return cloneLayoutItem({...g, i: child.key});
+        layout[i] = cloneLayoutItem({...g, i: child.key});
+      } else {
+        // Nothing provided: ensure this is added to the bottom
+        layout[i] = cloneLayoutItem({w: 1, h: 1, x: 0, y: bottom(layout), i: String(child.key)});
       }
-      // Nothing provided: ensure this is added to the bottom
-      return cloneLayoutItem({w: 1, h: 1, x: 0, y: bottom(layout), i: child.key || "1"});
     }
   });
 
